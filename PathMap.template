@@ -1,0 +1,29 @@
+<?php namespace server;
+use models\PathFile;
+class PathMap
+{
+	const MAP = {{map}};
+	const TIME = '{{time}}';
+	public static function getMap(string $name)
+	{
+		if(isset(self::MAP[$name])) return self::load($name);
+		$path = explode('/', $name);
+		$tryLoad = "";
+		while($part = array_pop($path))
+		{
+			$tryLoad .= "/$part";
+			if($loaded = self::load($tryLoad))
+			{
+				$loaded->arguments = $path;
+				return $loaded;
+			}
+		}
+		return PathFile::_404();
+	}
+	private static function load(string $name)
+	{
+		if(isset(self::MAP[$name]))
+			return new PathFile(...self::MAP[$name]);
+		return null;
+	}
+}
